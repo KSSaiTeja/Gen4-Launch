@@ -1,0 +1,13 @@
+{
+  "files.exclude": {
+    "**/.git": false,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/*.log": true,
+    "**/*.tmp": true,
+    "**/*.temp": true,
+    "**/*.backup": true
+  }
+}
