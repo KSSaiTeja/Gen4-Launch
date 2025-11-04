@@ -22,27 +22,27 @@ const DynamicConfetti = dynamic(
 
 const data = [
   {
-    option: "₹1 Only",
+    option: "Only for ₹499*",
     style: { backgroundColor: "#0066FF", textColor: "white" },
   },
   {
-    option: "Flat ₹500 off",
+    option: "Flat ₹1000 off",
     style: { backgroundColor: "#00BFFF", textColor: "white" },
   },
   {
-    option: "Flat ₹750 off",
+    option: "Flat ₹1500 off",
     style: { backgroundColor: "#1E90FF", textColor: "white" },
   },
   {
-    option: "Flat ₹1000 off",
+    option: "Flat ₹2000 off",
     style: { backgroundColor: "#87CEEB", textColor: "black" },
   },
   {
-    option: "Flat ₹1500 off",
+    option: "Flat ₹2500 off*",
     style: { backgroundColor: "#4169E1", textColor: "white" },
   },
   {
-    option: "Flat ₹2000 off",
+    option: "Flat ₹3000 off*",
     style: { backgroundColor: "#4A90E2", textColor: "white" },
   },
 ];
@@ -51,76 +51,92 @@ const data = [
 // Total weight: 1000 spins
 // HOW IT WORKS ACROSS MULTIPLE DEVICES:
 // - Each spin is INDEPENDENT and generates a random number between 0-999
-// - Out of 1000 users: ~5 get ₹1, ~350 get ₹500 off, ~280 get ₹750 off, etc.
+// - Rare offers: ₹499 (1%), ₹2500 off (1%), ₹3000 off (8%)
+// - Common offers: ₹1000 off (35%), ₹1500 off (30%), ₹2000 off (25%)
 // - The probability is consistent whether 10 users or 10,000 users spin
-// - Example: If 10,000 users spin, expect ~50 winners at ₹1 (0.5% of 10,000)
 const probabilityDistribution = [
-  5, // ₹1 Only (index 0) - Very rare (0.5%) - ~5 in 1000 users
-  350, // Flat ₹500 off (index 1) - Common (35%) - ~350 in 1000 users
-  280, // Flat ₹750 off (index 2) - Common (28%) - ~280 in 1000 users
-  200, // Flat ₹1000 off (index 3) - Moderate (20%) - ~200 in 1000 users
-  120, // Flat ₹1500 off (index 4) - Less common (12%) - ~120 in 1000 users
-  45, // Flat ₹2000 off (index 5) - Rare (4.5%) - ~45 in 1000 users
+  10, // Only for ₹499* (index 0) - Very rare (1%) - ~10 in 1000 users
+  350, // Flat ₹1000 off (index 1) - Common (35%) - ~350 in 1000 users
+  300, // Flat ₹1500 off (index 2) - Common (30%) - ~300 in 1000 users
+  250, // Flat ₹2000 off (index 3) - Common (25%) - ~250 in 1000 users
+  10, // Flat ₹2500 off* (index 4) - Very rare (1%) - ~10 in 1000 users
+  80, // Flat ₹3000 off* (index 5) - Rare (8%) - ~80 in 1000 users
 ];
 
 const getOfferDetails = (offer: string) => {
-  const basePrice = 7079; // Updated base price including GST
+  const basePriceXE = 6999; // Base price for Savart XE including GST
+  const basePriceXPlus = 17999; // Base price for Savart X+ including GST
+
   switch (offer) {
-    case "₹1 Only":
+    case "Only for ₹499*":
       return {
-        discountAmount: basePrice - 1,
-        finalPrice: 1,
-        subscriptionType: "Savart X",
-        savings: basePrice - 1,
-        discountPercentage: Math.round(((basePrice - 1) / basePrice) * 100),
-      };
-    case "Flat ₹500 off":
-      return {
-        discountAmount: 500,
-        finalPrice: basePrice - 500,
-        subscriptionType: "Savart X",
-        savings: 500,
-        discountPercentage: Math.round((500 / basePrice) * 100),
-      };
-    case "Flat ₹750 off":
-      return {
-        discountAmount: 750,
-        finalPrice: basePrice - 750,
-        subscriptionType: "Savart X",
-        savings: 750,
-        discountPercentage: Math.round((750 / basePrice) * 100),
+        discountAmount: 0,
+        finalPrice: 499,
+        subscriptionType: "Savart Lite",
+        savings: 0,
+        discountPercentage: 0,
+        basePrice: 499,
+        showBasePrice: false,
       };
     case "Flat ₹1000 off":
       return {
         discountAmount: 1000,
-        finalPrice: basePrice - 1000,
-        subscriptionType: "Savart X",
+        finalPrice: basePriceXE - 1000,
+        subscriptionType: "Savart XE",
         savings: 1000,
-        discountPercentage: Math.round((1000 / basePrice) * 100),
+        discountPercentage: Math.round((1000 / basePriceXE) * 100),
+        basePrice: basePriceXE,
+        showBasePrice: true,
       };
     case "Flat ₹1500 off":
       return {
         discountAmount: 1500,
-        finalPrice: basePrice - 1500,
-        subscriptionType: "Savart X",
+        finalPrice: basePriceXE - 1500,
+        subscriptionType: "Savart XE",
         savings: 1500,
-        discountPercentage: Math.round((1500 / basePrice) * 100),
+        discountPercentage: Math.round((1500 / basePriceXE) * 100),
+        basePrice: basePriceXE,
+        showBasePrice: true,
       };
     case "Flat ₹2000 off":
       return {
         discountAmount: 2000,
-        finalPrice: basePrice - 2000,
-        subscriptionType: "Savart X",
+        finalPrice: basePriceXE - 2000,
+        subscriptionType: "Savart XE",
         savings: 2000,
-        discountPercentage: Math.round((2000 / basePrice) * 100),
+        discountPercentage: Math.round((2000 / basePriceXE) * 100),
+        basePrice: basePriceXE,
+        showBasePrice: true,
+      };
+    case "Flat ₹2500 off*":
+      return {
+        discountAmount: 2500,
+        finalPrice: basePriceXPlus - 2500,
+        subscriptionType: "Savart X+",
+        savings: 2500,
+        discountPercentage: Math.round((2500 / basePriceXPlus) * 100),
+        basePrice: basePriceXPlus,
+        showBasePrice: true,
+      };
+    case "Flat ₹3000 off*":
+      return {
+        discountAmount: 3000,
+        finalPrice: basePriceXPlus - 3000,
+        subscriptionType: "Savart X+",
+        savings: 3000,
+        discountPercentage: Math.round((3000 / basePriceXPlus) * 100),
+        basePrice: basePriceXPlus,
+        showBasePrice: true,
       };
     default:
       return {
         discountAmount: 0,
-        finalPrice: basePrice,
-        subscriptionType: "Savart X",
+        finalPrice: basePriceXE,
+        subscriptionType: "Savart XE",
         savings: 0,
         discountPercentage: 0,
+        basePrice: basePriceXE,
+        showBasePrice: true,
       };
   }
 };
@@ -213,10 +229,30 @@ export default function EnhancedSpinWheel() {
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== "undefined") {
-      // Check for test mode in URL (?test=true)
       const urlParams = new URLSearchParams(window.location.search);
+      // Check for test mode in URL (?test=true)
       const testMode = urlParams.get("test") === "true";
       setIsTestMode(testMode);
+
+      // DEV MODE: Check for direct offer selection (?offer=0 to ?offer=5)
+      const offerParam = urlParams.get("offer");
+      let selectedOfferIndex = null;
+      if (offerParam !== null) {
+        const offerIndex = parseInt(offerParam, 10);
+        if (offerIndex >= 0 && offerIndex < data.length) {
+          selectedOfferIndex = offerIndex;
+          console.log(`🎯 DEV MODE: Direct offer selection enabled`);
+          console.log(`Offer Index ${offerIndex}: ${data[offerIndex].option}`);
+          console.log(
+            `Available offers: 0=₹499, 1=₹1000 off, 2=₹1500 off, 3=₹2000 off, 4=₹2500 off, 5=₹3000 off`,
+          );
+          console.log("To disable, remove ?offer=X from URL");
+        } else {
+          console.warn(
+            `⚠️ Invalid offer index: ${offerIndex}. Use 0-${data.length - 1}`,
+          );
+        }
+      }
 
       if (testMode) {
         console.log("🧪 TEST MODE ENABLED - Local storage disabled");
@@ -232,7 +268,6 @@ export default function EnhancedSpinWheel() {
         // Reset all state to initial values
         setStep(2);
         setPhoneNumber("");
-        setCurrentOffer("");
         setName("");
         setEmail("");
         setUniqueId("");
@@ -240,8 +275,29 @@ export default function EnhancedSpinWheel() {
         setPhoneError("");
         setMustSpin(false);
         setIsSpinning(false);
-        console.log("✅ Test mode: Reset to step 2 (phone entry page)");
+
+        // If offer is selected via URL, set it (but don't auto-advance)
+        if (selectedOfferIndex !== null) {
+          const selectedOffer = data[selectedOfferIndex].option;
+          setCurrentOffer(selectedOffer);
+          setPrizeNumber(selectedOfferIndex);
+          console.log(
+            `✅ Test mode: Offer ${selectedOfferIndex} pre-selected. Enter phone and click spin to test.`,
+          );
+        } else {
+          setCurrentOffer("");
+          console.log("✅ Test mode: Reset to step 2 (phone entry page)");
+        }
         return;
+      }
+
+      // If not in test mode but offer is selected, set it
+      if (selectedOfferIndex !== null) {
+        const selectedOffer = data[selectedOfferIndex].option;
+        setCurrentOffer(selectedOffer);
+        setPrizeNumber(selectedOfferIndex);
+        // Don't auto-advance - let user enter phone and click spin normally
+        // The handleSpinClick will detect this and skip the animation
       }
 
       // Initialize session data (only in production mode)
@@ -328,6 +384,60 @@ export default function EnhancedSpinWheel() {
 
   const handleSpinClick = () => {
     if (!mustSpin) {
+      // DEV MODE: Check if offer is pre-selected via URL parameter
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const offerParam = urlParams.get("offer");
+        if (offerParam !== null && currentOffer) {
+          // Offer already set via URL, skip spinning animation and go directly to result
+          console.log(
+            `🎯 DEV MODE: Skipping spin, using pre-selected offer: ${currentOffer}`,
+          );
+          const newUniqueId = Date.now().toString();
+          setUniqueId(newUniqueId);
+          if (!isTestMode) {
+            localStorage.setItem("currentOffer", currentOffer);
+            localStorage.setItem("currentPhoneNumber", phoneNumber);
+            localStorage.setItem("uniqueId", newUniqueId);
+          }
+
+          // Simulate the result directly (skip animation)
+          playSound("/confetti-sound.wav");
+          if (typeof DynamicConfetti === "function") {
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+              colors: ["#0066FF", "#00BFFF", "#1E90FF", "#87CEEB", "#4169E1"],
+            });
+          }
+
+          // Send initial data to Google Form
+          const offerDetails = getOfferDetails(currentOffer);
+          const offerDescription =
+            offerDetails.subscriptionType === "Savart Lite"
+              ? `${currentOffer} - ${offerDetails.subscriptionType}`
+              : offerDetails.subscriptionType === "Savart X+"
+              ? `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`
+              : `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`;
+
+          sendToGoogleForm({
+            "entry.924906700": phoneNumber,
+            "entry.855479267": offerDescription,
+            "entry.724459354": "",
+            "entry.514386980": "",
+            "entry.299128917": newUniqueId,
+          })
+            .then(() => console.log("✅ Initial data sent successfully!"))
+            .catch((error) =>
+              console.error("❌ Failed to send initial data:", error),
+            );
+
+          setStep(3);
+          return;
+        }
+      }
+
       const totalProbability = probabilityDistribution.reduce(
         (a, b) => a + b,
         0,
@@ -468,9 +578,16 @@ export default function EnhancedSpinWheel() {
       console.log("Offer:", newOffer);
       console.log("Unique ID:", newUniqueId);
 
+      const offerDescription =
+        offerDetails.subscriptionType === "Savart Lite"
+          ? `${newOffer} - ${offerDetails.subscriptionType}`
+          : offerDetails.subscriptionType === "Savart X+"
+          ? `${newOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`
+          : `${newOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`;
+
       sendToGoogleForm({
         "entry.924906700": phoneNumber,
-        "entry.855479267": `${newOffer} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`,
+        "entry.855479267": offerDescription,
         "entry.724459354": "", // Name - empty (not required in form)
         "entry.514386980": "", // Email - empty (not required in form)
         "entry.299128917": newUniqueId,
@@ -500,9 +617,16 @@ export default function EnhancedSpinWheel() {
       console.log("Email:", email);
       console.log("Unique ID:", uniqueId);
 
+      const offerDescription =
+        offerDetails.subscriptionType === "Savart Lite"
+          ? `${currentOffer} - ${offerDetails.subscriptionType}`
+          : offerDetails.subscriptionType === "Savart X+"
+          ? `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`
+          : `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`;
+
       await sendToGoogleForm({
         "entry.924906700": phoneNumber,
-        "entry.855479267": `${currentOffer} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`,
+        "entry.855479267": offerDescription,
         "entry.724459354": name,
         "entry.514386980": email,
         "entry.299128917": uniqueId,
@@ -564,7 +688,7 @@ export default function EnhancedSpinWheel() {
       <div className="w-full text-white relative mt-4">
         <div className="relative w-full" style={{ aspectRatio: "1920/450" }}>
           <Image
-            src="/banner-image.png"
+            src="/banner-image.svg"
             alt="Gen4 Launch - Spin to Win Banner"
             fill
             style={{ objectFit: "cover" }}
@@ -691,74 +815,120 @@ export default function EnhancedSpinWheel() {
             </form>
           )}
 
-          {step === 3 && (
-            <div className="text-center md:text-left bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg border border-[#0066FF]/30 shadow-lg shadow-blue-500/10">
-              <div className="flex items-center justify-center md:justify-start mb-4">
-                <h3 className="text-xl sm:text-2xl font-bold text-[#00BFFF]">
-                  Congratulations!
-                </h3>
-                <span className="ml-3 bg-gradient-to-r from-[#0066FF] to-[#00BFFF] text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                  {getOfferDetails(currentOffer).discountPercentage}% OFF
-                </span>
-              </div>
-              <p className="text-lg sm:text-xl font-semibold text-white mb-4">
-                You've won {getOfferDetails(currentOffer).subscriptionType}{" "}
-                subscription with{" "}
-                {getOfferDetails(currentOffer).discountPercentage}% off!
-              </p>
-              <p className="text-base sm:text-lg text-white mb-4">
-                Get lifetime access to Gen4's premium investment insights worth
-                ₹3 Lakh at an incredible price.
-              </p>
-              <div className="flex items-center justify-center md:justify-start space-x-4 mb-4">
-                <span className="text-lg sm:text-xl text-gray-400 line-through font-bold">
-                  ₹7,079
-                </span>
-                <span className="text-2xl sm:text-3xl font-bold text-[#00BFFF]">
-                  ₹{getOfferDetails(currentOffer).finalPrice.toLocaleString()}
-                </span>
-              </div>
-              <div className="bg-gradient-to-r from-[#0066FF]/20 to-[#00BFFF]/20 rounded-lg p-3 mb-4 border border-[#00BFFF]/30">
-                <p className="text-sm text-[#00BFFF] font-semibold">
-                  💰 You Save: ₹
-                  {getOfferDetails(currentOffer).savings.toLocaleString()}
-                </p>
-              </div>
-              <p className="text-sm sm:text-base text-white mb-6">
-                Welcome to Gen4! Your journey to smarter investing starts now.
-              </p>
-              <form onSubmit={handleSubmitDetails} className="space-y-4">
-                <Input
-                  type="text"
-                  placeholder="Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="border-[#0066FF]/30 bg-white text-black p-2 sm:p-3 text-sm sm:text-base focus:border-[#00BFFF] focus:ring-2 focus:ring-[#00BFFF]/20"
-                />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="border-[#0066FF]/30 bg-white text-black p-2 sm:p-3 text-sm sm:text-base focus:border-[#00BFFF] focus:ring-2 focus:ring-[#00BFFF]/20"
-                />
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-[#0066FF] to-[#00BFFF] hover:from-[#00BFFF] hover:to-[#1E90FF] text-white text-sm sm:text-base shadow-lg shadow-blue-500/25"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Submitting..." : "Claim Your Offer"}
-                </Button>
-                {submitError && (
-                  <p className="text-red-500 mt-2 text-sm sm:text-base">
-                    {submitError}
+          {step === 3 &&
+            (() => {
+              const offerDetails = getOfferDetails(currentOffer);
+              const isLiteOffer = currentOffer === "Only for ₹499*";
+              const isXPlusOffer =
+                currentOffer === "Flat ₹2500 off*" ||
+                currentOffer === "Flat ₹3000 off*";
+
+              return (
+                <div className="text-center md:text-left bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg border border-[#0066FF]/30 shadow-lg shadow-blue-500/10">
+                  <div className="flex items-center justify-center md:justify-start mb-4">
+                    <h3 className="text-xl sm:text-2xl font-bold text-[#00BFFF]">
+                      Congratulations!
+                    </h3>
+                    {!isLiteOffer && (
+                      <span className="ml-3 bg-gradient-to-r from-[#0066FF] to-[#00BFFF] text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                        {offerDetails.discountPercentage}% OFF
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-lg sm:text-xl font-semibold text-white mb-4">
+                    {isLiteOffer ? (
+                      <>
+                        You've won{" "}
+                        <span className="text-[#00BFFF]">
+                          {offerDetails.subscriptionType}
+                        </span>{" "}
+                        subscription for just ₹499!
+                      </>
+                    ) : isXPlusOffer ? (
+                      <>
+                        You've won{" "}
+                        <span className="text-[#00BFFF]">
+                          {offerDetails.subscriptionType}
+                        </span>{" "}
+                        subscription with {offerDetails.discountPercentage}%
+                        off!
+                      </>
+                    ) : (
+                      <>
+                        You've won{" "}
+                        <span className="text-[#00BFFF]">
+                          {offerDetails.subscriptionType}
+                        </span>{" "}
+                        subscription with {offerDetails.discountPercentage}%
+                        off!
+                      </>
+                    )}
                   </p>
-                )}
-              </form>
-            </div>
-          )}
+                  <p className="text-base sm:text-lg text-white mb-4">
+                    {isLiteOffer
+                      ? "Get access to Gen4's essential investment insights at an incredible price."
+                      : "Get lifetime access to Gen4's premium investment insights worth ₹3 Lakh at an incredible price."}
+                  </p>
+                  {offerDetails.showBasePrice ? (
+                    <div className="flex items-center justify-center md:justify-start space-x-4 mb-4">
+                      <span className="text-lg sm:text-xl text-gray-400 line-through font-bold">
+                        ₹{offerDetails.basePrice.toLocaleString()}
+                      </span>
+                      <span className="text-2xl sm:text-3xl font-bold text-[#00BFFF]">
+                        ₹{offerDetails.finalPrice.toLocaleString()}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center md:justify-start mb-4">
+                      <span className="text-2xl sm:text-3xl font-bold text-[#00BFFF]">
+                        ₹{offerDetails.finalPrice.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                  {offerDetails.savings > 0 && (
+                    <div className="bg-gradient-to-r from-[#0066FF]/20 to-[#00BFFF]/20 rounded-lg p-3 mb-4 border border-[#00BFFF]/30">
+                      <p className="text-sm text-[#00BFFF] font-semibold">
+                        💰 You Save: ₹{offerDetails.savings.toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  <p className="text-sm sm:text-base text-white mb-6">
+                    Welcome to Gen4! Your journey to smarter investing starts
+                    now.
+                  </p>
+                  <form onSubmit={handleSubmitDetails} className="space-y-4">
+                    <Input
+                      type="text"
+                      placeholder="Name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="border-[#0066FF]/30 bg-white text-black p-2 sm:p-3 text-sm sm:text-base focus:border-[#00BFFF] focus:ring-2 focus:ring-[#00BFFF]/20"
+                    />
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="border-[#0066FF]/30 bg-white text-black p-2 sm:p-3 text-sm sm:text-base focus:border-[#00BFFF] focus:ring-2 focus:ring-[#00BFFF]/20"
+                    />
+                    <Button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-[#0066FF] to-[#00BFFF] hover:from-[#00BFFF] hover:to-[#1E90FF] text-white text-sm sm:text-base shadow-lg shadow-blue-500/25"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Submitting..." : "Claim Your Offer"}
+                    </Button>
+                    {submitError && (
+                      <p className="text-red-500 mt-2 text-sm sm:text-base">
+                        {submitError}
+                      </p>
+                    )}
+                  </form>
+                </div>
+              );
+            })()}
           {step === 4 && (
             <div className="text-center md:text-left">
               <h3 className="text-xl sm:text-2xl font-bold mb-4 text-white">
@@ -774,6 +944,21 @@ export default function EnhancedSpinWheel() {
               </p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Terms and Conditions Section */}
+      <div className="w-full max-w-6xl px-4 py-6 mt-8 mb-8">
+        <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-lg border border-[#0066FF]/20">
+          <p className="text-xs sm:text-sm text-gray-300 text-center leading-relaxed">
+            <span className="font-semibold text-white">
+              * Terms & Conditions:
+            </span>{" "}
+            Savart Lite subscription is available for ₹499 only. Flat ₹2500 off
+            and Flat ₹3000 off discounts are exclusively applicable for Savart
+            X+ subscriptions. All offers are subject to availability and terms
+            of service.
+          </p>
         </div>
       </div>
     </div>
