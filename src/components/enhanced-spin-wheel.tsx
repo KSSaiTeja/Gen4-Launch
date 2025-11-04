@@ -229,13 +229,34 @@ export default function EnhancedSpinWheel() {
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      // Check for test mode in URL (?test=true)
-      const testMode = urlParams.get("test") === "true";
+      // Get URL parameters - handle both ?test=true&offer=0 and ?test=true?offer=0 formats
+      const searchString = window.location.search;
+      const urlParams = new URLSearchParams(searchString);
+
+      // Also check for malformed URLs with multiple ? separators
+      let testMode = urlParams.get("test") === "true";
+      let offerParam = urlParams.get("offer");
+
+      // Handle malformed URL like ?test=true?offer=0 (should be ?test=true&offer=0)
+      if (!offerParam && searchString.includes("?offer=")) {
+        const match = searchString.match(/[?&]offer=(\d+)/);
+        if (match) {
+          offerParam = match[1];
+          console.warn(
+            "⚠️ URL format issue detected. Use ?test=true&offer=0 (with &) instead of ?test=true?offer=0",
+          );
+        }
+      }
+      if (!testMode && searchString.includes("test=true")) {
+        testMode = true;
+        console.warn(
+          "⚠️ URL format issue detected. Use ?test=true&offer=0 (with &) instead of ?test=true?offer=0",
+        );
+      }
+
       setIsTestMode(testMode);
 
       // DEV MODE: Check for direct offer selection (?offer=0 to ?offer=5)
-      const offerParam = urlParams.get("offer");
       let selectedOfferIndex = null;
       if (offerParam !== null) {
         const offerIndex = parseInt(offerParam, 10);
