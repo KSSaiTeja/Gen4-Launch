@@ -22,28 +22,24 @@ const DynamicConfetti = dynamic(
 
 const data = [
   {
-    option: "Only for ₹499*",
-    style: { backgroundColor: "#0066FF", textColor: "white" },
-  },
-  {
-    option: "Flat ₹1000 off",
-    style: { backgroundColor: "#00BFFF", textColor: "white" },
-  },
-  {
-    option: "Flat ₹1500 off",
-    style: { backgroundColor: "#1E90FF", textColor: "white" },
-  },
-  {
-    option: "Flat ₹2000 off",
-    style: { backgroundColor: "#87CEEB", textColor: "black" },
+    option: "Flat ₹3000 off*",
+    style: { backgroundColor: "#4A90E2", textColor: "white" },
   },
   {
     option: "Flat ₹2500 off*",
     style: { backgroundColor: "#4169E1", textColor: "white" },
   },
   {
-    option: "Flat ₹3000 off*",
-    style: { backgroundColor: "#4A90E2", textColor: "white" },
+    option: "Flat ₹2000 off",
+    style: { backgroundColor: "#87CEEB", textColor: "black" },
+  },
+  {
+    option: "Flat ₹1500 off",
+    style: { backgroundColor: "#1E90FF", textColor: "white" },
+  },
+  {
+    option: "Flat ₹1000 off",
+    style: { backgroundColor: "#00BFFF", textColor: "white" },
   },
 ];
 
@@ -51,40 +47,49 @@ const data = [
 // Total weight: 1000 spins
 // HOW IT WORKS ACROSS MULTIPLE DEVICES:
 // - Each spin is INDEPENDENT and generates a random number between 0-999
-// - Rare offers: ₹499 (1%), ₹2500 off (1%), ₹3000 off (8%)
-// - Common offers: ₹1000 off (35%), ₹1500 off (30%), ₹2000 off (25%)
+// - Rare offers: ₹2500 off (1%), ₹3000 off (8%)
+// - Common offers: ₹2000 off (25%), ₹1500 off (30%), ₹1000 off (36%)
 // - The probability is consistent whether 10 users or 10,000 users spin
 const probabilityDistribution = [
-  10, // Only for ₹499* (index 0) - Very rare (1%) - ~10 in 1000 users
-  350, // Flat ₹1000 off (index 1) - Common (35%) - ~350 in 1000 users
-  300, // Flat ₹1500 off (index 2) - Common (30%) - ~300 in 1000 users
-  250, // Flat ₹2000 off (index 3) - Common (25%) - ~250 in 1000 users
-  10, // Flat ₹2500 off* (index 4) - Very rare (1%) - ~10 in 1000 users
-  80, // Flat ₹3000 off* (index 5) - Rare (8%) - ~80 in 1000 users
+  80, // Flat ₹3000 off* (index 0) - Rare (8%) - ~80 in 1000 users
+  10, // Flat ₹2500 off* (index 1) - Very rare (1%) - ~10 in 1000 users
+  250, // Flat ₹2000 off (index 2) - Common (25%) - ~250 in 1000 users
+  300, // Flat ₹1500 off (index 3) - Common (30%) - ~300 in 1000 users
+  360, // Flat ₹1000 off (index 4) - Common (36%) - ~360 in 1000 users
 ];
 
 const getOfferDetails = (offer: string) => {
-  const basePriceXE = 6999; // Base price for Savart XE including GST
-  const basePriceXPlus = 17999; // Base price for Savart X+ including GST
+  const basePriceXE = 6999; // Base price for Savart X (core tier) including GST
+  const basePriceXPlus = 17999; // Base price for Savart X (global tier) including GST
 
   switch (offer) {
-    case "Only for ₹499*":
+    case "Flat ₹3000 off*":
       return {
-        discountAmount: 0,
-        finalPrice: 499,
-        subscriptionType: "Savart Lite",
-        savings: 0,
-        discountPercentage: 0,
-        basePrice: 499,
-        showBasePrice: false,
+        discountAmount: 3000,
+        finalPrice: basePriceXPlus - 3000,
+        subscriptionType: "Savart X",
+        savings: 3000,
+        discountPercentage: Math.round((3000 / basePriceXPlus) * 100),
+        basePrice: basePriceXPlus,
+        showBasePrice: true,
       };
-    case "Flat ₹1000 off":
+    case "Flat ₹2500 off*":
       return {
-        discountAmount: 1000,
-        finalPrice: basePriceXE - 1000,
-        subscriptionType: "Savart XE",
-        savings: 1000,
-        discountPercentage: Math.round((1000 / basePriceXE) * 100),
+        discountAmount: 2500,
+        finalPrice: basePriceXPlus - 2500,
+        subscriptionType: "Savart X",
+        savings: 2500,
+        discountPercentage: Math.round((2500 / basePriceXPlus) * 100),
+        basePrice: basePriceXPlus,
+        showBasePrice: true,
+      };
+    case "Flat ₹2000 off":
+      return {
+        discountAmount: 2000,
+        finalPrice: basePriceXE - 2000,
+        subscriptionType: "Savart X",
+        savings: 2000,
+        discountPercentage: Math.round((2000 / basePriceXE) * 100),
         basePrice: basePriceXE,
         showBasePrice: true,
       };
@@ -92,54 +97,97 @@ const getOfferDetails = (offer: string) => {
       return {
         discountAmount: 1500,
         finalPrice: basePriceXE - 1500,
-        subscriptionType: "Savart XE",
+        subscriptionType: "Savart X",
         savings: 1500,
         discountPercentage: Math.round((1500 / basePriceXE) * 100),
         basePrice: basePriceXE,
         showBasePrice: true,
       };
-    case "Flat ₹2000 off":
+    case "Flat ₹1000 off":
       return {
-        discountAmount: 2000,
-        finalPrice: basePriceXE - 2000,
-        subscriptionType: "Savart XE",
-        savings: 2000,
-        discountPercentage: Math.round((2000 / basePriceXE) * 100),
+        discountAmount: 1000,
+        finalPrice: basePriceXE - 1000,
+        subscriptionType: "Savart X",
+        savings: 1000,
+        discountPercentage: Math.round((1000 / basePriceXE) * 100),
         basePrice: basePriceXE,
-        showBasePrice: true,
-      };
-    case "Flat ₹2500 off*":
-      return {
-        discountAmount: 2500,
-        finalPrice: basePriceXPlus - 2500,
-        subscriptionType: "Savart X+",
-        savings: 2500,
-        discountPercentage: Math.round((2500 / basePriceXPlus) * 100),
-        basePrice: basePriceXPlus,
-        showBasePrice: true,
-      };
-    case "Flat ₹3000 off*":
-      return {
-        discountAmount: 3000,
-        finalPrice: basePriceXPlus - 3000,
-        subscriptionType: "Savart X+",
-        savings: 3000,
-        discountPercentage: Math.round((3000 / basePriceXPlus) * 100),
-        basePrice: basePriceXPlus,
         showBasePrice: true,
       };
     default:
       return {
-        discountAmount: 0,
-        finalPrice: basePriceXE,
-        subscriptionType: "Savart XE",
-        savings: 0,
-        discountPercentage: 0,
+        discountAmount: 1000,
+        finalPrice: basePriceXE - 1000,
+        subscriptionType: "Savart X",
+        savings: 1000,
+        discountPercentage: Math.round((1000 / basePriceXE) * 100),
         basePrice: basePriceXE,
         showBasePrice: true,
       };
   }
 };
+
+const offerContent: Record<
+  string,
+  {
+    planLabel: string;
+    headline: string;
+    subHeadline: string;
+    body: string[];
+    footer: string;
+  }
+> = {
+  "Flat ₹1000 off": {
+    planLabel: "Savart X — ₹1,000 Off",
+    headline: "Congratulations!",
+    subHeadline: "You’ve won ₹1,000 off on your Savart X subscription!",
+    body: [
+      "Unlock Gen 4’s multi-asset strategy designed for serious investors.",
+      "Receive personalised insights across stocks, mutual funds, and ETFs with disciplined rebalancing support and expert monitoring.",
+    ],
+    footer: "Welcome to Gen 4 — elevate your portfolio with deeper insights.",
+  },
+  "Flat ₹1500 off": {
+    planLabel: "Savart X — ₹1,500 Off",
+    headline: "Congratulations!",
+    subHeadline: "You’ve won ₹1,500 off on your Savart X subscription!",
+    body: [
+      "Access Gen 4’s AI-powered multi-asset investment intelligence.",
+      "Diversify confidently across equities, funds, and ETFs while staying ahead with performance tracking and proactive risk monitoring.",
+    ],
+    footer: "Smarter investing starts with Gen 4. Claim your offer today.",
+  },
+  "Flat ₹2000 off": {
+    planLabel: "Savart X — ₹2,000 Off",
+    headline: "Congratulations!",
+    subHeadline: "You’ve won ₹2,000 off on your Savart X subscription!",
+    body: [
+      "Unlock Gen 4’s most sought-after multi-asset advisory experience — with tailored portfolio insights, stock and fund-level guidance, and real-time rebalancing prompts.",
+    ],
+    footer: "Welcome to Gen 4 — make every investment decision count.",
+  },
+  "Flat ₹2500 off*": {
+    planLabel: "Savart X — ₹2,500 Off",
+    headline: "Congratulations!",
+    subHeadline: "You’ve won ₹2,500 off on your Savart X subscription!",
+    body: [
+      "Step into Gen 4’s global advisory experience with curated exposure to Indian and U.S. markets across stocks, ETFs, and IPOs.",
+      "Benefit from deep-dive portfolio insights and cross-market strategies crafted by our research desk.",
+    ],
+    footer: "Welcome to Gen 4 — your gateway to global investing excellence.",
+  },
+  "Flat ₹3000 off*": {
+    planLabel: "Savart X — ₹3,000 Off",
+    headline: "Congratulations!",
+    subHeadline: "You’ve won ₹3,000 off on your Savart X subscription!",
+    body: [
+      "Experience the best of Gen 4 with a personalised, cross-market portfolio combining India and U.S. opportunities.",
+      "Gain access to advanced tracking, expert reviews, and curated global equities and IPO opportunities.",
+    ],
+    footer: "Welcome to Gen 4 — invest globally, grow confidently.",
+  },
+};
+
+const formatCurrency = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
 
 const GOOGLE_FORM_ACTION_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSfqfJiFfBWjCAGSkyMZnc4KzXtulW7gCNIBJqpD1L1qv4wRJA/formResponse";
@@ -265,7 +313,7 @@ export default function EnhancedSpinWheel() {
           console.log(`🎯 DEV MODE: Direct offer selection enabled`);
           console.log(`Offer Index ${offerIndex}: ${data[offerIndex].option}`);
           console.log(
-            `Available offers: 0=₹499, 1=₹1000 off, 2=₹1500 off, 3=₹2000 off, 4=₹2500 off, 5=₹3000 off`,
+            `Available offers: 0=₹3000 off, 1=₹2500 off, 2=₹2000 off, 3=₹1500 off, 4=₹1000 off`,
           );
           console.log("To disable, remove ?offer=X from URL");
         } else {
@@ -436,11 +484,13 @@ export default function EnhancedSpinWheel() {
           // Send initial data to Google Form
           const offerDetails = getOfferDetails(currentOffer);
           const offerDescription =
-            offerDetails.subscriptionType === "Savart Lite"
-              ? `${currentOffer} - ${offerDetails.subscriptionType}`
-              : offerDetails.subscriptionType === "Savart X+"
-              ? `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`
-              : `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`;
+            offerDetails.subscriptionType === "Savart X+"
+              ? `${currentOffer} - ${offerDetails.subscriptionType} (${
+                  offerDetails.discountPercentage
+                }% off - Save ${formatCurrency(offerDetails.savings)})`
+              : `${currentOffer} - ${offerDetails.subscriptionType} (${
+                  offerDetails.discountPercentage
+                }% off - Save ${formatCurrency(offerDetails.savings)})`;
 
           sendToGoogleForm({
             "entry.924906700": phoneNumber,
@@ -600,11 +650,13 @@ export default function EnhancedSpinWheel() {
       console.log("Unique ID:", newUniqueId);
 
       const offerDescription =
-        offerDetails.subscriptionType === "Savart Lite"
-          ? `${newOffer} - ${offerDetails.subscriptionType}`
-          : offerDetails.subscriptionType === "Savart X+"
-          ? `${newOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`
-          : `${newOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`;
+        offerDetails.subscriptionType === "Savart X+"
+          ? `${newOffer} - ${offerDetails.subscriptionType} (${
+              offerDetails.discountPercentage
+            }% off - Save ${formatCurrency(offerDetails.savings)})`
+          : `${newOffer} - ${offerDetails.subscriptionType} (${
+              offerDetails.discountPercentage
+            }% off - Save ${formatCurrency(offerDetails.savings)})`;
 
       sendToGoogleForm({
         "entry.924906700": phoneNumber,
@@ -639,11 +691,13 @@ export default function EnhancedSpinWheel() {
       console.log("Unique ID:", uniqueId);
 
       const offerDescription =
-        offerDetails.subscriptionType === "Savart Lite"
-          ? `${currentOffer} - ${offerDetails.subscriptionType}`
-          : offerDetails.subscriptionType === "Savart X+"
-          ? `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`
-          : `${currentOffer} - ${offerDetails.subscriptionType} (${offerDetails.discountPercentage}% off - Save ₹${offerDetails.savings})`;
+        offerDetails.subscriptionType === "Savart X+"
+          ? `${currentOffer} - ${offerDetails.subscriptionType} (${
+              offerDetails.discountPercentage
+            }% off - Save ${formatCurrency(offerDetails.savings)})`
+          : `${currentOffer} - ${offerDetails.subscriptionType} (${
+              offerDetails.discountPercentage
+            }% off - Save ${formatCurrency(offerDetails.savings)})`;
 
       await sendToGoogleForm({
         "entry.924906700": phoneNumber,
@@ -839,83 +893,77 @@ export default function EnhancedSpinWheel() {
           {step === 3 &&
             (() => {
               const offerDetails = getOfferDetails(currentOffer);
-              const isLiteOffer = currentOffer === "Only for ₹499*";
-              const isXPlusOffer =
-                currentOffer === "Flat ₹2500 off*" ||
-                currentOffer === "Flat ₹3000 off*";
+              const offerInfo = offerContent[currentOffer];
+              const headline = offerInfo?.headline ?? "Congratulations!";
+              const subHeadline =
+                offerInfo?.subHeadline ??
+                `You've won ${
+                  offerDetails.discountAmount
+                    ? formatCurrency(offerDetails.discountAmount)
+                    : "an"
+                } discount on your ${
+                  offerDetails.subscriptionType
+                } subscription!`;
+              const bodyCopy = offerInfo?.body ?? [
+                "Experience Gen 4’s multi-asset intelligence built for modern investors.",
+              ];
+              const footerCopy =
+                offerInfo?.footer ??
+                "Welcome to Gen 4 — smarter investing starts here.";
 
               return (
                 <div className="text-center md:text-left bg-gradient-to-br from-gray-900 to-black p-6 rounded-lg border border-[#0066FF]/30 shadow-lg shadow-blue-500/10">
+                  {offerInfo?.planLabel && (
+                    <div className="mb-4">
+                      <span className="inline-flex items-center rounded-full border border-[#00BFFF]/40 bg-[#00BFFF]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#8ED9FF]">
+                        {offerInfo.planLabel}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-center md:justify-start mb-4">
                     <h3 className="text-xl sm:text-2xl font-bold text-[#00BFFF]">
-                      Congratulations!
+                      {headline}
                     </h3>
-                    {!isLiteOffer && (
-                      <span className="ml-3 bg-gradient-to-r from-[#0066FF] to-[#00BFFF] text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                        {offerDetails.discountPercentage}% OFF
-                      </span>
-                    )}
+                    <span className="ml-3 bg-gradient-to-r from-[#0066FF] to-[#00BFFF] text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                      {offerDetails.discountPercentage}% OFF
+                    </span>
                   </div>
-                  <p className="text-lg sm:text-xl font-semibold text-white mb-4">
-                    {isLiteOffer ? (
-                      <>
-                        You've won{" "}
-                        <span className="text-[#00BFFF]">
-                          {offerDetails.subscriptionType}
-                        </span>{" "}
-                        subscription for just ₹499!
-                      </>
-                    ) : isXPlusOffer ? (
-                      <>
-                        You've won{" "}
-                        <span className="text-[#00BFFF]">
-                          {offerDetails.subscriptionType}
-                        </span>{" "}
-                        subscription with {offerDetails.discountPercentage}%
-                        off!
-                      </>
-                    ) : (
-                      <>
-                        You've won{" "}
-                        <span className="text-[#00BFFF]">
-                          {offerDetails.subscriptionType}
-                        </span>{" "}
-                        subscription with {offerDetails.discountPercentage}%
-                        off!
-                      </>
-                    )}
+                  <p className="text-lg sm:text-xl font-semibold text-white mb-2">
+                    {subHeadline}
                   </p>
-                  <p className="text-base sm:text-lg text-white mb-4">
-                    {isLiteOffer
-                      ? "Get access to Gen4's essential investment insights at an incredible price."
-                      : "Get lifetime access to Gen4's premium investment insights worth ₹3 Lakh at an incredible price."}
-                  </p>
-                  {offerDetails.showBasePrice ? (
-                    <div className="flex items-center justify-center md:justify-start space-x-4 mb-4">
-                      <span className="text-lg sm:text-xl text-gray-400 line-through font-bold">
-                        ₹{offerDetails.basePrice.toLocaleString()}
-                      </span>
-                      <span className="text-2xl sm:text-3xl font-bold text-[#00BFFF]">
-                        ₹{offerDetails.finalPrice.toLocaleString()}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center md:justify-start mb-4">
-                      <span className="text-2xl sm:text-3xl font-bold text-[#00BFFF]">
-                        ₹{offerDetails.finalPrice.toLocaleString()}
-                      </span>
-                    </div>
-                  )}
-                  {offerDetails.savings > 0 && (
-                    <div className="bg-gradient-to-r from-[#0066FF]/20 to-[#00BFFF]/20 rounded-lg p-3 mb-4 border border-[#00BFFF]/30">
-                      <p className="text-sm text-[#00BFFF] font-semibold">
-                        💰 You Save: ₹{offerDetails.savings.toLocaleString()}
+                  <div className="text-base sm:text-lg text-white mb-5 space-y-2">
+                    {bodyCopy.map((paragraph, index) => (
+                      <p key={index}>{paragraph}</p>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-center md:justify-start space-x-4 mb-3">
+                    <span className="text-lg sm:text-xl text-gray-400 line-through font-bold">
+                      {formatCurrency(offerDetails.basePrice)}
+                    </span>
+                    <span className="text-lg sm:text-xl font-semibold text-[#8ED9FF]">
+                      →
+                    </span>
+                    <span className="text-2xl sm:text-3xl font-bold text-[#00BFFF]">
+                      {formatCurrency(offerDetails.finalPrice)}
+                    </span>
+                  </div>
+                  <div className="bg-gradient-to-r from-[#0066FF]/20 to-[#00BFFF]/20 rounded-lg p-3 mb-4 border border-[#00BFFF]/30">
+                    <p className="text-sm text-[#00BFFF] font-semibold">
+                      💰 You Save: {formatCurrency(offerDetails.savings)}
+                    </p>
+                    <div className="mt-2 space-y-1 text-xs text-[#8ED9FF]">
+                      <p>
+                        <span className="font-semibold text-white">
+                          Offer valid on 1-year Savart X subscriptions.
+                        </span>
+                      </p>
+                      <p>
+                        Activation begins after the official Gen4 app launch.
                       </p>
                     </div>
-                  )}
+                  </div>
                   <p className="text-sm sm:text-base text-white mb-6">
-                    Welcome to Gen4! Your journey to smarter investing starts
-                    now.
+                    {footerCopy}
                   </p>
                   <form onSubmit={handleSubmitDetails} className="space-y-4">
                     <Input
@@ -971,15 +1019,52 @@ export default function EnhancedSpinWheel() {
       {/* Terms and Conditions Section */}
       <div className="w-full max-w-6xl px-4 py-6 mt-8 mb-8">
         <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-lg border border-[#0066FF]/20">
-          <p className="text-xs sm:text-sm text-gray-300 text-center leading-relaxed">
-            <span className="font-semibold text-white">
-              * Terms & Conditions:
-            </span>{" "}
-            Savart Lite subscription is available for ₹499 only. Flat ₹2500 off
-            and Flat ₹3000 off discounts are exclusively applicable for Savart
-            X+ subscriptions. All offers are subject to availability and terms
-            of service.
-          </p>
+          <div className="text-xs sm:text-sm text-gray-300 leading-relaxed space-y-2">
+            <p className="text-center font-semibold text-white">
+              Terms & Conditions
+            </p>
+            <ul className="space-y-2 text-left">
+              <li>
+                <span className="font-semibold text-white">Eligibility:</span>{" "}
+                Offers apply exclusively to 1-year Savart X subscriptions and
+                are extended to verified campaign participants.
+              </li>
+              <li>
+                <span className="font-semibold text-white">
+                  Discount Structure:
+                </span>{" "}
+                Launch discounts of ₹1,000, ₹1,500, ₹2,000, ₹2,500, and ₹3,000
+                are allocated based on spin outcomes and sales consultation.
+              </li>
+              <li>
+                <span className="font-semibold text-white">
+                  Effective Window:
+                </span>{" "}
+                Offers activate after the official Gen4 app launch and remain
+                valid until{" "}
+                <span className="font-semibold text-white">
+                  31 December 2025
+                </span>
+                .
+              </li>
+              <li>
+                <span className="font-semibold text-white">General:</span>{" "}
+                Availability is subject to eligibility checks, prevailing
+                program policies, and may be withdrawn without prior notice.
+              </li>
+              <li>
+                <span className="font-semibold text-white">Additional:</span>{" "}
+                All terms and conditions published on
+                <span className="font-semibold text-white">
+                  {" "}
+                  <a href="https://savart.com" target="_blank">
+                    savart.com
+                  </a>
+                </span>{" "}
+                apply to this offer campaign.
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
