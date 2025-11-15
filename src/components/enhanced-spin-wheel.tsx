@@ -1018,50 +1018,82 @@ export default function EnhancedSpinWheel() {
 
       {/* Terms and Conditions Section */}
       <div className="w-full max-w-6xl px-4 py-6 mt-8 mb-8">
-        <div className="bg-gradient-to-br from-gray-900/80 to-black/80 p-6 rounded-lg border border-[#0066FF]/20">
-          <div className="text-xs sm:text-sm text-gray-300 leading-relaxed space-y-2">
-            <p className="text-center font-semibold text-white">
+        <div className="bg-gradient-to-br from-gray-900/90 to-black/90 p-6 sm:p-8 rounded-lg border border-[#0066FF]/30 shadow-lg shadow-blue-500/10">
+          <div className="text-xs sm:text-sm text-gray-300 leading-relaxed space-y-3">
+            <p className="text-center font-bold text-white text-base sm:text-lg mb-4 pb-2 border-b border-[#0066FF]/30">
               Terms & Conditions
             </p>
-            <ul className="space-y-2 text-left">
-              <li>
-                <span className="font-semibold text-white">Eligibility:</span>{" "}
-                Offers apply exclusively to 1-year Savart X subscriptions and
-                are extended to verified campaign participants.
-              </li>
-              <li>
-                <span className="font-semibold text-white">
-                  Discount Structure:
-                </span>{" "}
-                Launch discounts of ₹1,000, ₹1,500, ₹2,000, ₹2,500, and ₹3,000
-                are allocated based on spin outcomes and sales consultation.
-              </li>
-              <li>
-                <span className="font-semibold text-white">
-                  Effective Window:
-                </span>{" "}
-                Offers activate after the official Gen4 app launch and remain
-                valid until{" "}
-                <span className="font-semibold text-white">
-                  31 December 2025
+            <ul className="space-y-2.5 text-left max-w-4xl mx-auto">
+              <li className="flex items-start">
+                <span className="text-[#00BFFF] mr-2 mt-0.5">•</span>
+                <span>
+                  <span className="font-semibold text-white">Eligibility:</span>{" "}
+                  Offers apply exclusively to 1-year Savart X subscriptions and
+                  are extended to verified campaign participants.
                 </span>
-                .
               </li>
-              <li>
-                <span className="font-semibold text-white">General:</span>{" "}
-                Availability is subject to eligibility checks, prevailing
-                program policies, and may be withdrawn without prior notice.
+              <li className="flex items-start">
+                <span className="text-[#00BFFF] mr-2 mt-0.5">•</span>
+                <span>
+                  <span className="font-semibold text-white">
+                    Discount Structure:
+                  </span>{" "}
+                  Launch discounts of ₹1,000, ₹1,500, ₹2,000, ₹2,500, and ₹3,000
+                  are allocated based on spin outcomes and sales consultation.
+                </span>
               </li>
-              <li>
-                <span className="font-semibold text-white">Additional:</span>{" "}
-                All terms and conditions published on
-                <span className="font-semibold text-white">
-                  {" "}
-                  <a href="https://savart.com" target="_blank">
+              <li className="flex items-start">
+                <span className="text-[#00BFFF] mr-2 mt-0.5">•</span>
+                <span>
+                  <span className="font-semibold text-white">
+                    Multiple Attempts:
+                  </span>{" "}
+                  Participants using the same credentials (phone number, email,
+                  or other identifying information) for multiple spin attempts
+                  will receive the{" "}
+                  <span className="font-semibold text-white">
+                    lowest discount offer
+                  </span>{" "}
+                  among all their entries.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#00BFFF] mr-2 mt-0.5">•</span>
+                <span>
+                  <span className="font-semibold text-white">
+                    Effective Window:
+                  </span>{" "}
+                  Offers activate after the official Gen4 app launch and remain
+                  valid until{" "}
+                  <span className="font-semibold text-white">
+                    31 December 2025
+                  </span>
+                  .
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#00BFFF] mr-2 mt-0.5">•</span>
+                <span>
+                  <span className="font-semibold text-white">General:</span>{" "}
+                  Availability is subject to eligibility checks, prevailing
+                  program policies, and may be withdrawn without prior notice.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-[#00BFFF] mr-2 mt-0.5">•</span>
+                <span>
+                  <span className="font-semibold text-white">Additional:</span>{" "}
+                  All terms and conditions published on{" "}
+                  <a
+                    href="https://savart.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-[#00BFFF] hover:text-[#00BFFF]/80 underline transition-colors"
+                  >
                     savart.com
-                  </a>
-                </span>{" "}
-                apply to this offer campaign.
+                  </a>{" "}
+                  apply to this offer campaign.
+                </span>
               </li>
             </ul>
           </div>
