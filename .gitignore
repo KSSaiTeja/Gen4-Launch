@@ -37,6 +37,3 @@ next-env.d.ts
 
 #cursor
 .vscode
-
-# lead tracking data
-/data

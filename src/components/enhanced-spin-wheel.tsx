@@ -23,15 +23,15 @@ const DynamicConfetti = dynamic(
 const data = [
   {
     option: "Flat ₹2500 off*",
-    style: { backgroundColor: "#4A90E2", textColor: "white" },
-  },
-  {
-    option: "Flat ₹2000 off*",
     style: { backgroundColor: "#4169E1", textColor: "white" },
   },
   {
+    option: "Flat ₹2000 off*",
+    style: { backgroundColor: "#4A90E2", textColor: "white" },
+  },
+  {
     option: "Flat ₹1000 off",
-    style: { backgroundColor: "#87CEEB", textColor: "black" },
+    style: { backgroundColor: "#00BFFF", textColor: "white" },
   },
   {
     option: "Flat ₹750 off",
@@ -39,7 +39,7 @@ const data = [
   },
   {
     option: "Flat ₹500 off",
-    style: { backgroundColor: "#00BFFF", textColor: "white" },
+    style: { backgroundColor: "#87CEEB", textColor: "black" },
   },
 ];
 
@@ -48,19 +48,19 @@ const data = [
 // HOW IT WORKS ACROSS MULTIPLE DEVICES:
 // - Each spin is INDEPENDENT and generates a random number between 0-999
 // - Rare offers: ₹2500 off (1%), ₹2000 off (8%)
-// - Common offers: ₹1000 off (35%), ₹750 off (30%), ₹500 off (26%)
+// - Common offers: ₹1000 off (30%), ₹750 off (30%), ₹500 off (31%)
 // - The probability is consistent whether 10 users or 10,000 users spin
 const probabilityDistribution = [
   10, // Flat ₹2500 off* (index 0) - Very rare (1%) - ~10 in 1000 users
   80, // Flat ₹2000 off* (index 1) - Rare (8%) - ~80 in 1000 users
-  350, // Flat ₹1000 off (index 2) - Common (35%) - ~350 in 1000 users
+  300, // Flat ₹1000 off (index 2) - Common (30%) - ~300 in 1000 users
   300, // Flat ₹750 off (index 3) - Common (30%) - ~300 in 1000 users
-  260, // Flat ₹500 off (index 4) - Common (26%) - ~260 in 1000 users
+  310, // Flat ₹500 off (index 4) - Common (31%) - ~310 in 1000 users
 ];
 
 const getOfferDetails = (offer: string) => {
-  const basePriceXE = 6999; // Base price for Savart XE including GST
-  const basePriceXPlus = 17999; // Base price for Savart X+ including GST
+  const basePriceXE = 6999; // Base price for Savart X (core tier) including GST
+  const basePriceXPlus = 17999; // Base price for Savart X (global tier) including GST
 
   switch (offer) {
     case "Flat ₹2500 off*":
@@ -708,28 +708,6 @@ export default function EnhancedSpinWheel() {
       });
 
       console.log("✅ Complete data sent successfully!");
-
-      // Track lead count (non-blocking, don't fail if this fails)
-      try {
-        const trackResponse = await fetch("/api/leads/track", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            uniqueId,
-            phoneNumber,
-            offer: currentOffer,
-          }),
-        });
-        const trackData = await trackResponse.json();
-        if (trackData.success) {
-          console.log(`📊 Lead tracked. Total leads: ${trackData.count}`);
-        }
-      } catch (error) {
-        console.error("Failed to track lead (non-critical):", error);
-        // Don't throw - this is non-critical
-      }
       if (typeof window !== "undefined" && !isTestMode) {
         // Enhanced user tracking (skip in test mode)
         const playedUsers = JSON.parse(
