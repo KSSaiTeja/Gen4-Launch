@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
-import { readFile, writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
-
-const DATA_DIR = path.join(process.cwd(), "data");
-const LEADS_FILE = path.join(DATA_DIR, "leads.json");
+import { kv } from "@vercel/kv";
 
 interface Lead {
   uniqueId: string;
@@ -13,31 +8,27 @@ interface Lead {
   offer: string;
 }
 
-// Ensure data directory exists
-async function ensureDataDir() {
-  if (!existsSync(DATA_DIR)) {
-    await mkdir(DATA_DIR, { recursive: true });
-  }
-}
+const LEADS_KEY = "gen4:leads";
 
-// Read all leads
+// Read all leads from KV
 async function readLeads(): Promise<Lead[]> {
-  await ensureDataDir();
   try {
-    if (existsSync(LEADS_FILE)) {
-      const data = await readFile(LEADS_FILE, "utf-8");
-      return JSON.parse(data);
-    }
+    const leads = await kv.get<Lead[]>(LEADS_KEY);
+    return leads || [];
   } catch (error) {
-    console.error("Error reading leads file:", error);
+    console.error("Error reading leads from KV:", error);
+    return [];
   }
-  return [];
 }
 
-// Write leads
+// Write leads to KV
 async function writeLeads(leads: Lead[]): Promise<void> {
-  await ensureDataDir();
-  await writeFile(LEADS_FILE, JSON.stringify(leads, null, 2), "utf-8");
+  try {
+    await kv.set(LEADS_KEY, leads);
+  } catch (error) {
+    console.error("Error writing leads to KV:", error);
+    throw error;
+  }
 }
 
 // POST - Import existing leads (bulk import)

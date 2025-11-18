@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
-import { readFile, writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const LEADS_FILE = path.join(DATA_DIR, "leads.json");
 const GOOGLE_SHEET_ID = "1pSuU0B8f9k7A_ST0qc7Oq3yEONAS4eHRJkSsZXNykUE";
 // Try multiple export URL formats
 const GOOGLE_SHEET_URLS = [
@@ -12,40 +7,6 @@ const GOOGLE_SHEET_URLS = [
   `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/export?format=csv&gid=0`,
   `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv`,
 ];
-
-interface Lead {
-  uniqueId: string;
-  phoneNumber: string;
-  timestamp: string;
-  offer: string;
-}
-
-// Ensure data directory exists
-async function ensureDataDir() {
-  if (!existsSync(DATA_DIR)) {
-    await mkdir(DATA_DIR, { recursive: true });
-  }
-}
-
-// Read all leads
-async function readLeads(): Promise<Lead[]> {
-  await ensureDataDir();
-  try {
-    if (existsSync(LEADS_FILE)) {
-      const data = await readFile(LEADS_FILE, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error("Error reading leads file:", error);
-  }
-  return [];
-}
-
-// Write leads
-async function writeLeads(leads: Lead[]): Promise<void> {
-  await ensureDataDir();
-  await writeFile(LEADS_FILE, JSON.stringify(leads, null, 2), "utf-8");
-}
 
 // Parse CSV line
 function parseCSVLine(line: string): string[] {
@@ -151,20 +112,13 @@ export async function GET() {
       );
     }
 
-    // Read existing leads
-    const existingLeads = await readLeads();
-    const existingIds = new Set(existingLeads.map((lead) => lead.uniqueId));
-    const existingPhones = new Set(
-      existingLeads.map((lead) => lead.phoneNumber),
-    );
+    // Count unique leads from Google Sheets
+    const uniquePhones = new Set<string>();
+    let validRows = 0;
 
-    let added = 0;
-    let skipped = 0;
-    const newLeads: Lead[] = [];
-
-    // Process each row
+    // Process each row to count unique leads
     for (const row of rows) {
-      // Try to find phone number and unique ID in various column formats
+      // Try to find phone number in various column formats
       const phoneNumber =
         row["Phone Number"] ||
         row["entry.924906700"] ||
@@ -172,72 +126,39 @@ export async function GET() {
         row["phone"] ||
         "";
 
-      const uniqueId =
-        row["Unique ID"] ||
-        row["entry.299128917"] ||
-        row["UniqueID"] ||
-        row["uniqueId"] ||
-        row["Timestamp"] || // Use timestamp as fallback unique ID
-        "";
-
-      const offer =
-        row["Offer"] || row["entry.855479267"] || row["offer"] || "Unknown";
-
-      const timestamp =
-        row["Timestamp"] || row["entry.0"] || new Date().toISOString();
-
-      // Skip if missing required fields
-      if (!phoneNumber || !uniqueId) {
-        skipped++;
-        continue;
-      }
-
       // Clean phone number (remove non-digits)
       const cleanPhone = phoneNumber.replace(/\D/g, "");
 
-      // Skip if phone number is too short
+      // Skip if phone number is too short or missing
       if (cleanPhone.length < 10) {
-        skipped++;
         continue;
       }
 
-      // Check for duplicates
-      if (existingIds.has(uniqueId) || existingPhones.has(cleanPhone)) {
-        skipped++;
-        continue;
-      }
-
-      // Add new lead
-      const newLead: Lead = {
-        uniqueId,
-        phoneNumber: cleanPhone,
-        offer: offer || "Unknown",
-        timestamp: timestamp || new Date().toISOString(),
-      };
-
-      newLeads.push(newLead);
-      existingIds.add(uniqueId);
-      existingPhones.add(cleanPhone);
-      added++;
+      // Count unique phone numbers
+      uniquePhones.add(cleanPhone);
+      validRows++;
     }
 
-    // Add new leads to existing ones
-    const allLeads = [...existingLeads, ...newLeads];
-
-    // Write updated leads
-    await writeLeads(allLeads);
+    const totalCount = uniquePhones.size;
 
     console.log(
-      `✅ Sync complete: Added ${added} new leads, skipped ${skipped} duplicates`,
+      `✅ Sync complete: Found ${totalCount} unique leads in Google Sheets`,
     );
 
     return NextResponse.json(
       {
         success: true,
-        total: allLeads.length,
-        added,
-        skipped,
-        message: `Synced ${added} new leads from Google Sheets. ${skipped} duplicates skipped.`,
+        count: totalCount,
+        uniqueLeads: totalCount,
+        totalRows: rows.length,
+        validRows: validRows,
+        message: `Found ${totalCount} unique leads in Google Sheets. Set this as your LEAD_BASE_COUNT environment variable.`,
+        instructions: [
+          `1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables`,
+          `2. Add new variable: LEAD_BASE_COUNT = ${totalCount}`,
+          `3. Redeploy your project`,
+          `4. New leads will automatically increment from ${totalCount}`,
+        ],
       },
       { status: 200 },
     );

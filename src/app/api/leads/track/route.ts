@@ -1,10 +1,4 @@
 import { NextResponse } from "next/server";
-import { readFile, writeFile, mkdir } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
-
-const DATA_DIR = path.join(process.cwd(), "data");
-const LEADS_FILE = path.join(DATA_DIR, "leads.json");
 
 interface Lead {
   uniqueId: string;
@@ -13,31 +7,45 @@ interface Lead {
   offer: string;
 }
 
-// Ensure data directory exists
-async function ensureDataDir() {
-  if (!existsSync(DATA_DIR)) {
-    await mkdir(DATA_DIR, { recursive: true });
-  }
+// Use environment variable for base count (manually set)
+const BASE_COUNT = parseInt(process.env.LEAD_BASE_COUNT || "0", 10);
+const LEADS_KEY = "gen4:new_leads";
+
+// Try to use KV if available, otherwise use in-memory (for development)
+let kv: any = null;
+let memoryStore: Lead[] = [];
+
+try {
+  const kvModule = require("@vercel/kv");
+  kv = kvModule.kv;
+} catch (error) {
+  console.log("KV not available, using memory store (development mode)");
 }
 
-// Read all leads
-async function readLeads(): Promise<Lead[]> {
-  await ensureDataDir();
-  try {
-    if (existsSync(LEADS_FILE)) {
-      const data = await readFile(LEADS_FILE, "utf-8");
-      return JSON.parse(data);
+// Read new leads (tracked after base count was set)
+async function readNewLeads(): Promise<Lead[]> {
+  if (kv) {
+    try {
+      const leads = await kv.get<Lead[]>(LEADS_KEY);
+      return leads || [];
+    } catch (error) {
+      console.error("Error reading from KV:", error);
     }
-  } catch (error) {
-    console.error("Error reading leads file:", error);
   }
-  return [];
+  return memoryStore;
 }
 
-// Write leads
-async function writeLeads(leads: Lead[]): Promise<void> {
-  await ensureDataDir();
-  await writeFile(LEADS_FILE, JSON.stringify(leads, null, 2), "utf-8");
+// Write new leads
+async function writeNewLeads(leads: Lead[]): Promise<void> {
+  if (kv) {
+    try {
+      await kv.set(LEADS_KEY, leads);
+      return;
+    } catch (error) {
+      console.error("Error writing to KV:", error);
+    }
+  }
+  memoryStore = leads;
 }
 
 // POST - Track a new lead (only if unique)
@@ -56,20 +64,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Read existing leads
-    const leads = await readLeads();
+    // Read existing new leads (only those tracked after base count)
+    const newLeads = await readNewLeads();
 
     // Check if this lead already exists (by uniqueId or phoneNumber)
-    const existingLead = leads.find(
+    const existingLead = newLeads.find(
       (lead) => lead.uniqueId === uniqueId || lead.phoneNumber === phoneNumber,
     );
 
     if (existingLead) {
       // Lead already exists, return current count without incrementing
+      const totalCount = BASE_COUNT + newLeads.length;
       return NextResponse.json(
         {
           success: true,
-          count: leads.length,
+          count: totalCount,
+          baseCount: BASE_COUNT,
+          newLeads: newLeads.length,
           isDuplicate: true,
           message: "Lead already tracked",
         },
@@ -85,15 +96,19 @@ export async function POST(request: Request) {
       timestamp: new Date().toISOString(),
     };
 
-    leads.push(newLead);
+    newLeads.push(newLead);
 
-    // Write updated leads
-    await writeLeads(leads);
+    // Write updated new leads
+    await writeNewLeads(newLeads);
+
+    const totalCount = BASE_COUNT + newLeads.length;
 
     return NextResponse.json(
       {
         success: true,
-        count: leads.length,
+        count: totalCount,
+        baseCount: BASE_COUNT,
+        newLeads: newLeads.length,
         isDuplicate: false,
         message: "Lead tracked successfully",
       },
@@ -111,15 +126,18 @@ export async function POST(request: Request) {
   }
 }
 
-// GET - Get all leads (for admin/debugging)
+// GET - Get all new leads (for admin/debugging)
 export async function GET() {
   try {
-    const leads = await readLeads();
+    const newLeads = await readNewLeads();
+    const totalCount = BASE_COUNT + newLeads.length;
     return NextResponse.json(
       {
         success: true,
-        count: leads.length,
-        leads: leads,
+        count: totalCount,
+        baseCount: BASE_COUNT,
+        newLeads: newLeads.length,
+        leads: newLeads,
       },
       { status: 200 },
     );
@@ -129,7 +147,9 @@ export async function GET() {
       {
         success: false,
         error: "Failed to read leads",
-        count: 0,
+        count: BASE_COUNT,
+        baseCount: BASE_COUNT,
+        newLeads: 0,
         leads: [],
       },
       { status: 500 },
