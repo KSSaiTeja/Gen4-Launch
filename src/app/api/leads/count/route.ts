@@ -7,8 +7,8 @@ let cachedCount: { count: number; timestamp: number } | null = null;
 
 // Google Sheets configuration
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
-const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "Sheet1"; // Default to Sheet1 if not specified
-const PHONE_COLUMN_INDEX = 2; // Column D (0-indexed: A=0, B=1, C=2, D=3)
+const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "Form Responses 1"; // Default to Form Responses 1 if not specified
+const PHONE_COLUMN_INDEX = 2; // Column C (0-indexed: A=0, B=1, C=2, D=3)
 
 // Initialize Google Sheets API with service account
 async function getGoogleSheetsClient() {
@@ -127,7 +127,7 @@ async function getUniqueLeadCount(): Promise<number> {
   const dataRows = rows.slice(1);
 
   // Extract phone numbers and count unique ones
-  // Phone number is in column D (index 3)
+  // Phone number is in column C (index 2)
   const phoneNumbers = new Set<string>();
 
   dataRows.forEach((row) => {
