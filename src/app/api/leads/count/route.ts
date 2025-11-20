@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 
-// Cache for 30 seconds
-const CACHE_DURATION = 30 * 1000; // 30 seconds in milliseconds
+// Cache for 1 minute
+const CACHE_DURATION = 60 * 1000; // 60 seconds (1 minute) in milliseconds
 let cachedCount: { count: number; timestamp: number } | null = null;
 
 // Google Sheets configuration
