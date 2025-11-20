@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 
-// Cache for 1 minute
-const CACHE_DURATION = 60 * 1000; // 60 seconds (1 minute) in milliseconds
-let cachedCount: { count: number; timestamp: number } | null = null;
-
 // Google Sheets configuration
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "Form Responses 1"; // Default to Form Responses 1 if not specified
@@ -126,17 +122,24 @@ async function getUniqueLeadCount(): Promise<number> {
   // Skip header row (first row)
   const dataRows = rows.slice(1);
 
+  console.log(
+    `[Lead Count API] Total rows in sheet: ${rows.length} (${dataRows.length} data rows)`,
+  );
+
   // Extract phone numbers and count unique ones
   // Phone number is in column C (index 2)
   const phoneNumbers = new Set<string>();
+  let skippedCount = 0;
+  let invalidCount = 0;
 
-  dataRows.forEach((row) => {
+  dataRows.forEach((row, index) => {
     // Check if row exists and has enough columns
     if (row && row.length > PHONE_COLUMN_INDEX) {
       const phoneValue = row[PHONE_COLUMN_INDEX];
 
       // Skip if phone value is undefined, null, or empty
       if (!phoneValue) {
+        skippedCount++;
         return;
       }
 
@@ -161,30 +164,44 @@ async function getUniqueLeadCount(): Promise<number> {
           !digitsOnly.match(/^0+$/) // Not all zeros
         ) {
           phoneNumbers.add(digitsOnly); // Store normalized phone (digits only)
+        } else {
+          invalidCount++;
+          console.log(
+            `[Lead Count API] Invalid phone in row ${
+              index + 2
+            }: ${phone} -> ${digitsOnly}`,
+          );
+        }
+      } else {
+        invalidCount++;
+        if (phone) {
+          console.log(
+            `[Lead Count API] Phone too short in row ${
+              index + 2
+            }: "${phone}" (length: ${phone.length})`,
+          );
         }
       }
+    } else {
+      skippedCount++;
     }
   });
+
+  console.log(
+    `[Lead Count API] Unique phone numbers: ${phoneNumbers.size}, Skipped: ${skippedCount}, Invalid: ${invalidCount}`,
+  );
+  console.log(
+    `[Lead Count API] Sample phones (first 5):`,
+    Array.from(phoneNumbers).slice(0, 5),
+  );
 
   return phoneNumbers.size;
 }
 
 export async function GET() {
   try {
-    // Check cache first
-    const now = Date.now();
-    if (cachedCount && now - cachedCount.timestamp < CACHE_DURATION) {
-      return NextResponse.json({ count: cachedCount.count });
-    }
-
-    // Fetch fresh count
+    // Always fetch fresh count from Google Sheets (no caching)
     const count = await getUniqueLeadCount();
-
-    // Update cache
-    cachedCount = {
-      count,
-      timestamp: now,
-    };
 
     return NextResponse.json({ count });
   } catch (error) {
