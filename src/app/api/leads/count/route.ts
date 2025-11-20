@@ -200,10 +200,20 @@ async function getUniqueLeadCount(): Promise<number> {
 
 export async function GET() {
   try {
-    // Always fetch fresh count from Google Sheets (no caching)
+    // Always fetch fresh count from Google Sheets (no caching at all)
     const count = await getUniqueLeadCount();
 
-    return NextResponse.json({ count });
+    // Return response with no-cache headers to prevent any caching
+    return NextResponse.json(
+      { count },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      },
+    );
   } catch (error) {
     console.error("Error fetching lead count:", error);
     return NextResponse.json(
