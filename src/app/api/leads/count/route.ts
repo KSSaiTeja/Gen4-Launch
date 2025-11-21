@@ -201,11 +201,21 @@ async function getUniqueLeadCount(): Promise<number> {
 export async function GET() {
   try {
     // Always fetch fresh count from Google Sheets (no caching at all)
+    // This ensures every API call gets the latest data from the sheet
+    console.log(
+      `[Lead Count API] Fetching fresh data from Google Sheets at ${new Date().toISOString()}`,
+    );
+
     const count = await getUniqueLeadCount();
+    const fetchedAt = new Date().toISOString();
 
     // Return response with no-cache headers to prevent any caching
+    // Include timestamp to verify data freshness
     return NextResponse.json(
-      { count },
+      {
+        count,
+        fetchedAt, // Timestamp showing when data was fetched
+      },
       {
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
