@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 
+// Force dynamic rendering - prevent any caching at Vercel edge/CDN level
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // Google Sheets configuration
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_NAME = process.env.GOOGLE_SHEET_NAME || "Form Responses 1"; // Default to Form Responses 1 if not specified
